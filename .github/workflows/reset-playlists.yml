@@ -1,0 +1,27 @@
+name: Reset playlists
+
+on:
+  schedule:
+    # ~3am America/Toronto. GitHub Actions cron is always UTC and does not
+    # shift for daylight saving, so this lands at 3am during EDT (spring-fall)
+    # and 2am during EST (winter) -- close enough for a playlist refresh.
+    - cron: "0 7 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - run: python main.py --live
+        env:
+          SPOTIPY_CLIENT_ID: ${{ secrets.SPOTIPY_CLIENT_ID }}
+          SPOTIPY_CLIENT_SECRET: ${{ secrets.SPOTIPY_CLIENT_SECRET }}
+          SPOTIPY_REFRESH_TOKEN: ${{ secrets.SPOTIPY_REFRESH_TOKEN }}
