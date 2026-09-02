@@ -5,6 +5,9 @@
 playlists:
   - target_playlist: "1rcJGJGyftaXYuwYj3ndvY"
     source_playlists:
-      - "0DQ8ePPwiPHjUAbH7GQnlI"
-      - "4wUvFDeDdDW9tzZ9vQQzEP"
-    track_count: 25
+      - id: "1OcRyCOLswRlS9OsQn7wqx"
+        count: 10
+      - id: "4iscQaUCEDx2eISluWpCCz"
+        count: 5
+      - id: "7hQ3pPSnMdf0m7UvB11gqj"
+        count: 15
