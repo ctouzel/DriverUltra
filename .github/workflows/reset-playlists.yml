@@ -2,10 +2,14 @@ name: Reset playlists
 
 on:
   schedule:
-    # ~3am America/Toronto. GitHub Actions cron is always UTC and does not
-    # shift for daylight saving, so this lands at 3am during EDT (spring-fall)
-    # and 2am during EST (winter) -- close enough for a playlist refresh.
-    - cron: "0 7 * * *"
+    # GitHub's `schedule` trigger has no timing guarantee -- observed delay
+    # on this repo has been a consistent ~5h29m (07:00 UTC scheduled -> 12:29
+    # UTC / 8:29am EDT actual, twice in a row). Scheduling earlier, at a
+    # non-round minute (avoids the queueing pile-up that happens at exact
+    # hour/half-hour marks), to land comfortably before 7am EDT when
+    # Christian starts listening. If the delay pattern changes, this needs
+    # re-tuning -- check actual run times in the Actions tab.
+    - cron: "17 4 * * *"
   workflow_dispatch: {}
 
 jobs:
