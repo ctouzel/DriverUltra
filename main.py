@@ -25,10 +25,13 @@ Usage:
 """
 
 import logging
+import random
 import sys
 
 from read_sources import fetch_all_tracks, get_spotify_client, load_config
 from selection import select_tracks
+
+DEFAULT_TRACK_COUNT = 25
 
 logging.basicConfig(
     level=logging.INFO,
@@ -44,41 +47,49 @@ def chunked(seq, size):
 
 
 def process_mapping(sp, mapping, live):
-    """Process one target/sources mapping. Each source has its own fixed
-    track_count -- tracks are picked independently per source, not from one
-    pooled/shuffled mix. Raises on failure -- the caller decides whether to
-    let one failure stop the whole run."""
+    """Process one target/sources mapping. Raises on failure -- the caller
+    decides whether to let one failure stop the whole run."""
     target_id = mapping["target_playlist"]
-    sources = mapping["source_playlists"]
+    source_ids = mapping["source_playlists"]
+    count = mapping.get("track_count", DEFAULT_TRACK_COUNT)
 
-    picked = []
-    seen_uris = set()
-    for source in sources:
-        playlist_id = source["id"]
-        count = source["count"]
+    all_tracks = []
+    for playlist_id in source_ids:
         tracks, total_reported, skipped = fetch_all_tracks(sp, playlist_id)
         log.info(
             "[%s] source %s: %d usable tracks (API total %s, %d skipped)",
             target_id, playlist_id, len(tracks), total_reported, skipped,
         )
-        selected = select_tracks(tracks, count)
-        log.info(
-            "[%s] source %s: picked %d of %d requested",
-            target_id, playlist_id, len(selected), count,
-        )
-        for t in selected:
-            if t["uri"] not in seen_uris:
-                seen_uris.add(t["uri"])
-                picked.append(t)
+        all_tracks.extend(tracks)
 
-    if not picked:
-        raise RuntimeError(f"[{target_id}] no usable tracks found across sources {sources}")
+    if not all_tracks:
+        raise RuntimeError(f"[{target_id}] no usable tracks found across sources {source_ids}")
 
-    uris = [t["uri"] for t in picked]
+    picked = select_tracks(all_tracks, count)
+
+    # select_tracks() already dedupes and rng.sample() already returns a
+    # random order, but shuffle explicitly here too -- once the selection is
+    # complete, the final playlist order shouldn't silently depend on
+    # whatever order the sources happened to be read in.
+    random.shuffle(picked)
+
+    # Defensive final dedup right before writing: if this ever fires, it
+    # means a duplicate slipped past select_tracks() (e.g. a future change
+    # to the selection logic), so catch it here rather than write dupes.
+    uris = []
+    seen_uris = set()
+    for t in picked:
+        if t["uri"] in seen_uris:
+            log.warning("[%s] duplicate URI in final selection, dropping: %s", target_id, t["uri"])
+            continue
+        seen_uris.add(t["uri"])
+        uris.append(t["uri"])
+
+    unique_pool = len({t["uri"] for t in all_tracks})
 
     log.info(
-        "[%s] selected %d tracks total from %d source(s)",
-        target_id, len(uris), len(sources),
+        "[%s] selected %d tracks from %d source(s) (pool: %d tracks, %d unique)",
+        target_id, len(uris), len(source_ids), len(all_tracks), unique_pool,
     )
 
     if not live:
