@@ -46,26 +46,66 @@ def chunked(seq, size):
         yield seq[i : i + size]
 
 
+def split_source_specs(source_playlists):
+    """A source_playlists entry is either:
+    - a plain playlist ID string -- pooled together with any other plain
+      entries, and `track_count` total is drawn at random from that pool.
+    - a {id, count} mapping -- exactly `count` tracks are drawn from that
+      one source alone, independent of everything else.
+    Returns (fixed_specs, pooled_ids): fixed_specs is a list of
+    (playlist_id, count) pairs, pooled_ids is a list of plain playlist IDs.
+    """
+    fixed_specs = []
+    pooled_ids = []
+    for entry in source_playlists:
+        if isinstance(entry, dict):
+            if "id" not in entry or "count" not in entry:
+                raise ValueError(f"source entry needs both 'id' and 'count': {entry!r}")
+            fixed_specs.append((entry["id"], entry["count"]))
+        else:
+            pooled_ids.append(entry)
+    return fixed_specs, pooled_ids
+
+
 def process_mapping(sp, mapping, live):
     """Process one target/sources mapping. Raises on failure -- the caller
     decides whether to let one failure stop the whole run."""
     target_id = mapping["target_playlist"]
-    source_ids = mapping["source_playlists"]
-    count = mapping.get("track_count", DEFAULT_TRACK_COUNT)
+    source_playlists = mapping["source_playlists"]
+    default_count = mapping.get("track_count", DEFAULT_TRACK_COUNT)
 
-    all_tracks = []
-    for playlist_id in source_ids:
+    fixed_specs, pooled_ids = split_source_specs(source_playlists)
+
+    picked = []
+    total_pool_size = 0
+
+    # Fixed-count sources: draw exactly `count` tracks from each, independently
+    # of every other source.
+    for playlist_id, count in fixed_specs:
         tracks, total_reported, skipped = fetch_all_tracks(sp, playlist_id)
         log.info(
-            "[%s] source %s: %d usable tracks (API total %s, %d skipped)",
-            target_id, playlist_id, len(tracks), total_reported, skipped,
+            "[%s] source %s: %d usable tracks (API total %s, %d skipped) -- drawing %d",
+            target_id, playlist_id, len(tracks), total_reported, skipped, count,
         )
-        all_tracks.extend(tracks)
+        total_pool_size += len(tracks)
+        picked.extend(select_tracks(tracks, count))
 
-    if not all_tracks:
-        raise RuntimeError(f"[{target_id}] no usable tracks found across sources {source_ids}")
+    # Pooled sources (plain ID strings, if any): combine and draw
+    # `default_count` (mapping-level track_count) total from the combined pool.
+    if pooled_ids:
+        pool = []
+        for playlist_id in pooled_ids:
+            tracks, total_reported, skipped = fetch_all_tracks(sp, playlist_id)
+            log.info(
+                "[%s] source %s: %d usable tracks (API total %s, %d skipped)",
+                target_id, playlist_id, len(tracks), total_reported, skipped,
+            )
+            pool.extend(tracks)
+        total_pool_size += len(pool)
+        picked.extend(select_tracks(pool, default_count))
 
-    picked = select_tracks(all_tracks, count)
+    if not picked:
+        raise RuntimeError(f"[{target_id}] no usable tracks found across sources {source_playlists}")
 
     # select_tracks() already dedupes and rng.sample() already returns a
     # random order, but shuffle explicitly here too -- once the selection is
@@ -85,11 +125,9 @@ def process_mapping(sp, mapping, live):
         seen_uris.add(t["uri"])
         uris.append(t["uri"])
 
-    unique_pool = len({t["uri"] for t in all_tracks})
-
     log.info(
-        "[%s] selected %d tracks from %d source(s) (pool: %d tracks, %d unique)",
-        target_id, len(uris), len(source_ids), len(all_tracks), unique_pool,
+        "[%s] selected %d tracks from %d source(s) (%d fixed-count, %d pooled; %d tracks read total)",
+        target_id, len(uris), len(fixed_specs) + len(pooled_ids), len(fixed_specs), len(pooled_ids), total_pool_size,
     )
 
     if not live:
