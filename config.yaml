@@ -11,3 +11,9 @@ playlists:
         count: 5
       - id: "7hQ3pPSnMdf0m7UvB11gqj"
         count: 15
+  - target_playlist: "1BFOIUTfIwWsWgP9VF5GB7"
+    source_playlists:
+      - id: "3SI8rEW2Ih3R2N18E9qrjo"
+        count: 10
+      - id: "45jIQZIiS1mLixM67FLyjT"
+        count: 20
