@@ -3,7 +3,7 @@
 # entrée sous "playlists" ci-dessous.
 
 playlists:
-  - target_playlist: "1rcJGJGyftaXYuwYj3ndvY"
+  - target_playlist: "1rcJGJGyftaXYuwYj3ndvY" # RADIO EXILE
     source_playlists:
       - id: "1OcRyCOLswRlS9OsQn7wqx"
         count: 10
@@ -11,9 +11,13 @@ playlists:
         count: 5
       - id: "7hQ3pPSnMdf0m7UvB11gqj"
         count: 15
-  - target_playlist: "1BFOIUTfIwWsWgP9VF5GB7"
+  - target_playlist: "1BFOIUTfIwWsWgP9VF5GB7" # RADIO ROUTE ZERO
     source_playlists:
       - id: "3SI8rEW2Ih3R2N18E9qrjo"
         count: 10
       - id: "45jIQZIiS1mLixM67FLyjT"
         count: 20
+  - target_playlist: "5Lx1ZfmLDwPLsfkqbkuUpn" # RADIO CALEXICO
+    source_playlists:
+      - id: "34JcorHjWWxXNhjQh1c9gZ" # EXTENDED
+        count: 22
