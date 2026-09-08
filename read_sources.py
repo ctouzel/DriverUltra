@@ -79,6 +79,10 @@ def fetch_all_tracks(sp, playlist_id):
                     "uri": media["uri"],
                     "title": media["name"],
                     "artists": ", ".join(a["name"] for a in media.get("artists", [])),
+                    # When this track was added to *this* playlist (ISO 8601,
+                    # e.g. "2020-11-14T12:13:08Z"). Used by radio-type mappings
+                    # to age Top Songs entries into Classics; unused elsewhere.
+                    "added_at": item.get("added_at"),
                 }
             )
         results = sp.next(results) if results.get("next") else None

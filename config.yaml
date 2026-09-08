@@ -1,9 +1,12 @@
 # SpotDriver config — liste de mappings cible/sources.
-# Pour ajouter une nouvelle playlist cible plus tard, ajoute une nouvelle
-# entrée sous "playlists" ci-dessous.
+# Deux types de mapping :
+#   - simple (par défaut si "type" est omis) : une cible, des sources en pool
+#     commun (chaînes -> track_count total) et/ou à compte fixe ({id, count}).
+#   - radio : voir la section HEARTLAND FM ci-dessous pour le détail des champs.
 
 playlists:
-  - target_playlist: "1rcJGJGyftaXYuwYj3ndvY" # RADIO EXILE
+  - type: simple
+    target_playlist: "1rcJGJGyftaXYuwYj3ndvY" # RADIO EXILE
     source_playlists:
       - id: "1OcRyCOLswRlS9OsQn7wqx"
         count: 10
@@ -11,13 +14,44 @@ playlists:
         count: 5
       - id: "7hQ3pPSnMdf0m7UvB11gqj"
         count: 15
-  - target_playlist: "1BFOIUTfIwWsWgP9VF5GB7" # RADIO ROUTE ZERO
+
+  - type: simple
+    target_playlist: "1BFOIUTfIwWsWgP9VF5GB7" # RADIO ROUTE ZERO
     source_playlists:
       - id: "3SI8rEW2Ih3R2N18E9qrjo"
         count: 10
       - id: "45jIQZIiS1mLixM67FLyjT"
         count: 20
-  - target_playlist: "5Lx1ZfmLDwPLsfkqbkuUpn" # RADIO CALEXICO
+
+  - type: simple
+    target_playlist: "5Lx1ZfmLDwPLsfkqbkuUpn" # RADIO CALEXICO
     source_playlists:
       - id: "34JcorHjWWxXNhjQh1c9gZ" # EXTENDED
         count: 22
+
+  - type: radio
+    target_playlist: "5Y4wHgfmEtk2m93CgmxMyJ" # HEARTLAND FM
+    sources:
+      top_songs: "5u3vupqo2EAogOPV8XQ5BK"       # toutes incluses, aucun échantillon
+      top_albums: "6BIBoHbBO21FoCniEeT294"
+      classics: "0q1R8yX3PRn5dnObItyopP"
+      great_classics: "4wUvFDeDdDW9tzZ9vQQzEP"
+    samples:
+      top_albums: 5
+      classics: 15
+      great_classics: 2
+    # Toute chanson de "top_songs" ajoutée à cette playlist depuis plus de
+    # `after_weeks` semaines (selon la date d'ajout que Spotify enregistre
+    # déjà) est copiée dans "classics" (sans être retirée de top_songs, et
+    # sans doublons dans classics).
+    classics_promotion:
+      after_weeks: 3
+    # Sources actives seulement pendant une fenêtre de dates (mois-jour,
+    # se répète chaque année). D'autres entrées pourront être ajoutées ici
+    # pour d'autres occasions.
+    holidays:
+      - name: "Christmas"
+        source: "7LRmOwpKRK8X9eLkjwZFl2"
+        start: "12-01"
+        end: "12-25"
+        count: 35
