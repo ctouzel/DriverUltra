@@ -14,6 +14,16 @@ playlists:
         count: 5
       - id: "7hQ3pPSnMdf0m7UvB11gqj" # EXTENDED
         count: 15
+        
+  - type: simple
+    target_playlist: "0FFxvYEZ0KaBFq0SCIgv9s" # DISCO SATURDAY
+    source_playlists:
+      - id: "7sw5N7NV2hLu7ZUtozMJis" # CLASSICS 
+        count: 30
+      - id: "3vgpHj64xSFCQS1tamVCsw" # MODERN 
+        count: 5
+      - id: "1Y1lyxsDbasKY0cGZIl2dj" # NOVELTIES 
+        count: 5
 
   - type: simple
     target_playlist: "1BFOIUTfIwWsWgP9VF5GB7" # RADIO ROUTE ZERO 
