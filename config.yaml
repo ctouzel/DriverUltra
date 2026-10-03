@@ -16,6 +16,18 @@ playlists:
         count: 15
         
   - type: simple
+    target_playlist: "2gVrm5v2MVU95tLLndoDqv" # OLDFIELD RADIO 
+    source_playlists:
+      - id: "0aMcRDqdyez2JE9rzv27cG" # CLASSICS 
+        count: 5
+      - id: "3srP0JLDRV3dGq1wRXrizS" # ALL OLDFIELD 
+        count: 15
+      - id: "56yyskgGfwRI71BqJtptnp" # PLAYED ON 
+        count: 3
+      - id: "3TN7xh0AV4wSXzaocFY3dt" # EXTENDED
+        count: 17
+        
+  - type: simple
     target_playlist: "0FFxvYEZ0KaBFq0SCIgv9s" # DISCO SATURDAY
     source_playlists:
       - id: "7sw5N7NV2hLu7ZUtozMJis" # CLASSICS 
