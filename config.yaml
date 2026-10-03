@@ -60,11 +60,16 @@ playlists:
     # se répète chaque année). D'autres entrées pourront être ajoutées ici
     # pour d'autres occasions.
     holidays:
-      - name: "Christmas"
+      - name: "Christmas Pt1"
         source: "7LRmOwpKRK8X9eLkjwZFl2"
-        start: "12-01"
+        start: "11-20"
+        end: "12-4"
+        count: 20
+      - name: "Christmas Pt2"
+        source: "7LRmOwpKRK8X9eLkjwZFl2"
+        start: "12-05"
         end: "12-25"
-        count: 35
+        count: 40
 
   - type: radio
     target_playlist: "71KJC2LwY1fxM8MqCKYfWi" # THE LOWDOWN
