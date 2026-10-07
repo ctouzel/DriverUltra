@@ -82,6 +82,11 @@ playlists:
         start: "12-05"
         end: "12-25"
         count: 40
+      - name: "Reels"
+        source: "2Y6yb3AEsMe27elj4FkcYX"
+        start: "12-26"
+        end: "1-1"
+        count: 40
 
   - type: radio
     target_playlist: "71KJC2LwY1fxM8MqCKYfWi" # THE LOWDOWN
