@@ -72,6 +72,11 @@ playlists:
     # se répète chaque année). D'autres entrées pourront être ajoutées ici
     # pour d'autres occasions.
     holidays:
+      - name: "Halloween"
+        source: "0TpvxZ1bI4tCcllRxzvDYp"
+        start: "10-29"
+        end: "10-31"
+        count: 40
       - name: "Christmas Pt1"
         source: "7LRmOwpKRK8X9eLkjwZFl2"
         start: "11-20"
