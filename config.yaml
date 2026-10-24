@@ -3,10 +3,14 @@
 #   - simple (par défaut si "type" est omis) : une cible, des sources en pool
 #     commun (chaînes -> track_count total) et/ou à compte fixe ({id, count}).
 #   - radio : voir la section HEARTLAND FM ci-dessous pour le détail des champs.
+# Optionnel, pour tout type : update_days: [mon, thu] (ou lundi, jeu, ...)
+# limite la mise à jour à certains jours ; les autres jours, la playlist
+# n'est pas touchée. Sans update_days : mise à jour tous les jours.
 
 playlists:
   - type: simple
     target_playlist: "1rcJGJGyftaXYuwYj3ndvY" # RADIO EXILE
+    update_days: [mon, thu]   # mise à jour seulement lundi et jeudi
     source_playlists:
       - id: "1OcRyCOLswRlS9OsQn7wqx" # MAIN ALBUM
         count: 10

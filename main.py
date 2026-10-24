@@ -14,6 +14,14 @@ Two mapping types:
       seasonal "holiday" sources), with an aging Top-Songs-to-Classics
       promotion step -- see process_radio_mapping() and radio.py.
 
+Update days (any mapping type): an optional `update_days` list restricts a
+mapping to certain weekdays, e.g. `update_days: [mon, thu]`. On other days
+the target playlist is left untouched. Omit it to update every day. The day
+is judged on the UTC date, same as the holiday windows: the nightly run is
+scheduled at 04:17 UTC, so the UTC date is always the morning the playlist
+is meant for (in Toronto local time it can still be the previous evening in
+winter). Pass --all-days to ignore update_days (handy for testing).
+
 Safety: DRY RUN by default -- prints/logs what each mapping would do, writes
 nothing. Pass --live to actually apply the resets.
 
@@ -31,6 +39,7 @@ Usage:
     export SPOTIPY_REFRESH_TOKEN="..."
     python main.py            # dry run (safe, no writes)
     python main.py --live     # actually reset every target playlist
+    python main.py --all-days # ignore update_days restrictions
 """
 
 import logging
@@ -50,6 +59,36 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 log = logging.getLogger("spotdriver")
+
+
+WEEKDAY_NAMES = {
+    # English and French, full or short -- all map to date.weekday() (Mon=0).
+    "mon": 0, "monday": 0, "lun": 0, "lundi": 0,
+    "tue": 1, "tuesday": 1, "mar": 1, "mardi": 1,
+    "wed": 2, "wednesday": 2, "mer": 2, "mercredi": 2,
+    "thu": 3, "thursday": 3, "jeu": 3, "jeudi": 3,
+    "fri": 4, "friday": 4, "ven": 4, "vendredi": 4,
+    "sat": 5, "saturday": 5, "sam": 5, "samedi": 5,
+    "sun": 6, "sunday": 6, "dim": 6, "dimanche": 6,
+}
+
+
+def parse_update_days(raw):
+    """Turn a mapping's `update_days` value into a set of weekday numbers
+    (Mon=0 .. Sun=6), or None if the mapping updates every day."""
+    if raw is None:
+        return None
+    if isinstance(raw, str):
+        raw = [raw]
+    days = set()
+    for name in raw:
+        key = str(name).strip().lower()
+        if key not in WEEKDAY_NAMES:
+            raise ValueError(f"unknown day in update_days: {name!r}")
+        days.add(WEEKDAY_NAMES[key])
+    if not days:
+        raise ValueError("update_days is empty -- remove it to update every day")
+    return days
 
 
 def chunked(seq, size):
@@ -265,6 +304,8 @@ def process_radio_mapping(sp, mapping, live):
 
 def main():
     live = "--live" in sys.argv
+    all_days = "--all-days" in sys.argv
+    today = datetime.now(timezone.utc).date()
 
     config = load_config()
     mappings = config["playlists"]
@@ -278,10 +319,19 @@ def main():
     log.info("%s -- processing %d playlist mapping(s)", "LIVE" if live else "DRY RUN", len(mappings))
 
     failures = []
+    skipped = []
     for mapping in mappings:
         target_id = mapping.get("target_playlist", "?")
         mapping_type = mapping.get("type", "simple")
         try:
+            update_days = parse_update_days(mapping.get("update_days"))
+            if update_days is not None and today.weekday() not in update_days:
+                if all_days:
+                    log.info("[%s] not an update day (%s) -- updating anyway (--all-days)", target_id, today.strftime("%A"))
+                else:
+                    log.info("[%s] not an update day (%s) -- skipped, playlist left as is", target_id, today.strftime("%A"))
+                    skipped.append(target_id)
+                    continue
             if mapping_type == "simple":
                 process_mapping(sp, mapping, live)
             elif mapping_type == "radio":
@@ -291,6 +341,9 @@ def main():
         except Exception:
             log.exception("[%s] failed -- continuing with remaining mappings.", target_id)
             failures.append(target_id)
+
+    if skipped:
+        log.info("Skipped %d mapping(s) (not an update day): %s", len(skipped), skipped)
 
     if not live:
         log.info("Dry run only -- nothing written. Re-run with --live to apply.")
