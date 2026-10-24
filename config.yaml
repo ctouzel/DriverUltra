@@ -76,12 +76,69 @@ playlists:
     # se répète chaque année). D'autres entrées pourront être ajoutées ici
     # pour d'autres occasions.
     holidays:
-      - name: "Christmas"
+      - name: "Halloween"
+        source: "0TpvxZ1bI4tCcllRxzvDYp"
+        start: "10-29"
+        end: "10-31"
+        count: 40
+      - name: "Christmas Pt1"
         source: "7LRmOwpKRK8X9eLkjwZFl2"
-        start: "12-01"
+        start: "11-20"
+        end: "12-4"
+        count: 20
+      - name: "Christmas Pt2"
+        source: "7LRmOwpKRK8X9eLkjwZFl2"
+        start: "12-05"
         end: "12-25"
-        count: 35
-
+        count: 40
+      - name: "Reels"
+        source: "2Y6yb3AEsMe27elj4FkcYX"
+        start: "12-26"
+        end: "1-1"
+        count: 40
+        
+  - type: radio
+    target_playlist: "12xAHzCe9tccDj8LrmZoah" # THE BUCKNER SHOW 
+    sources:
+      top_songs: "1xKYEcRVMNYfHfRCThD7SG"   
+      top_albums: "6BIBoHbBO21FoCniEeT294"
+      classics: "54usJpU1xsq2R3UVCJLy4D"
+      great_classics: "4wUvFDeDdDW9tzZ9vQQzEP"
+    samples:
+      top_albums: 5
+      classics: 15
+      great_classics: 2
+    # Toute chanson de "top_songs" ajoutée à cette playlist depuis plus de
+    # `after_weeks` semaines (selon la date d'ajout que Spotify enregistre
+    # déjà) est copiée dans "classics" (sans être retirée de top_songs, et
+    # sans doublons dans classics).
+    classics_promotion:
+      after_weeks: 3
+    # Sources actives seulement pendant une fenêtre de dates (mois-jour,
+    # se répète chaque année). D'autres entrées pourront être ajoutées ici
+    # pour d'autres occasions.
+    holidays:
+      - name: "Halloween"
+        source: "0TpvxZ1bI4tCcllRxzvDYp"
+        start: "10-29"
+        end: "10-31"
+        count: 40
+      - name: "Christmas Pt1"
+        source: "7LRmOwpKRK8X9eLkjwZFl2"
+        start: "11-20"
+        end: "12-4"
+        count: 20
+      - name: "Christmas Pt2"
+        source: "7LRmOwpKRK8X9eLkjwZFl2"
+        start: "12-05"
+        end: "12-25"
+        count: 40
+      - name: "Reels"
+        source: "2Y6yb3AEsMe27elj4FkcYX"
+        start: "12-26"
+        end: "1-1"
+        count: 40
+        
   - type: radio
     target_playlist: "71KJC2LwY1fxM8MqCKYfWi" # THE LOWDOWN
     sources:
