@@ -21,6 +21,7 @@ playlists:
         
   - type: simple
     target_playlist: "2gVrm5v2MVU95tLLndoDqv" # OLDFIELD RADIO 
+    update_days: [tue]   # mise à jour seulement mardi
     source_playlists:
       - id: "0aMcRDqdyez2JE9rzv27cG" # CLASSICS 
         count: 5
@@ -33,6 +34,7 @@ playlists:
         
   - type: simple
     target_playlist: "0FFxvYEZ0KaBFq0SCIgv9s" # DISCO SATURDAY
+    update_days: [wed]   # mise à jour seulement mercredi
     source_playlists:
       - id: "7sw5N7NV2hLu7ZUtozMJis" # CLASSICS 
         count: 30
@@ -42,7 +44,8 @@ playlists:
         count: 5
 
   - type: simple
-    target_playlist: "1BFOIUTfIwWsWgP9VF5GB7" # RADIO ROUTE ZERO 
+    target_playlist: "1BFOIUTfIwWsWgP9VF5GB7" # RADIO ROUTE ZERO
+    update_days: [thu]   # mise à jour seulement jeudi    
     source_playlists:
       - id: "3SI8rEW2Ih3R2N18E9qrjo" # MAIN ALBUM
         count: 10
@@ -51,9 +54,18 @@ playlists:
 
   - type: simple
     target_playlist: "5Lx1ZfmLDwPLsfkqbkuUpn" # RADIO CALEXICO
+    update_days: [fri]   # mise à jour seulement mercredi
     source_playlists:
       - id: "34JcorHjWWxXNhjQh1c9gZ" # EXTENDED
         count: 22
+      - id: "0wRAKRMUhdWnsaaHIyNvhR" # CLASSICS 
+        count: 5
+      - id: "3tbSocStDFxoxo977wSqV5" # ALL CALEXICO
+        count: 15
+      - id: "4WTlxpFx3XOCAM4nYChoMm" # PLAYED ON
+        count: 3
+      - id: "5N1Golu74hi1L4RFgisM1d" # INFLUENCES
+        count: 5
 
   - type: radio
     target_playlist: "5Y4wHgfmEtk2m93CgmxMyJ" # HEARTLAND FM
