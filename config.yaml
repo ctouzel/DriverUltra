@@ -131,22 +131,22 @@ playlists:
     # pour d'autres occasions.
     holidays:
       - name: "Halloween"
-        source: "0TpvxZ1bI4tCcllRxzvDYp"
+        source: "0KKpitG6VT0gpSktD9893t" 
         start: "10-29"
         end: "10-31"
         count: 40
       - name: "Christmas Pt1"
-        source: "7LRmOwpKRK8X9eLkjwZFl2"
+        source: "0Dd2CpnG7c1h02FfpBZVNt" 
         start: "11-20"
         end: "12-4"
         count: 20
       - name: "Christmas Pt2"
-        source: "7LRmOwpKRK8X9eLkjwZFl2"
+        source: "0Dd2CpnG7c1h02FfpBZVNt"
         start: "12-05"
         end: "12-25"
         count: 40
       - name: "Reels"
-        source: "2Y6yb3AEsMe27elj4FkcYX"
+        source: "4NYmYdCGHCWAYBim7JxVW5" 
         start: "12-26"
         end: "1-1"
         count: 40
