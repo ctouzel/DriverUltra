@@ -108,6 +108,11 @@ playlists:
         start: "12-26"
         end: "1-1"
         count: 40
+      - name: "Valentine"
+        source: "6IlzfBZ7Mc3fzqngH1skUx"
+        start: "2-13"
+        end: "2-14"
+        count: 20
         
   - type: radio
     target_playlist: "12xAHzCe9tccDj8LrmZoah" # THE BUCKNER SHOW 
