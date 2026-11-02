@@ -106,8 +106,13 @@ playlists:
       - name: "Reels"
         source: "2Y6yb3AEsMe27elj4FkcYX"
         start: "12-26"
-        end: "1-1"
+        end: "12-31"
         count: 40
+      - name: "New Year"
+        source: "3wSdeKEikeJH6YtQVsC9ob"
+        start: "1-1"
+        end: "1-1"
+        count: 20
       - name: "Valentine"
         source: "6IlzfBZ7Mc3fzqngH1skUx"
         start: "2-13"
