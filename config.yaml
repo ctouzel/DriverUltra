@@ -123,12 +123,14 @@ playlists:
     target_playlist: "12xAHzCe9tccDj8LrmZoah" # THE BUCKNER SHOW 
     sources:
       top_songs: "1xKYEcRVMNYfHfRCThD7SG"   
-      top_albums: "6BIBoHbBO21FoCniEeT294"
-      classics: "54usJpU1xsq2R3UVCJLy4D"
-      great_classics: "4wUvFDeDdDW9tzZ9vQQzEP"
+      top_albums: "15KcSBgf7cw3MpMobxrRPC" 
+      classics: "54usJpU1xsq2R3UVCJLy4D" 
+      retro: "1r3HVmVENnJurs1WhMkrX6"
+      great_classics: "0DQ8ePPwiPHjUAbH7GQnlI"
     samples:
       top_albums: 5
       classics: 15
+      retro: 20
       great_classics: 2
     # Toute chanson de "top_songs" ajoutée à cette playlist depuis plus de
     # `after_weeks` semaines (selon la date d'ajout que Spotify enregistre
