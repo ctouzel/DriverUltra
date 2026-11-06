@@ -118,6 +118,11 @@ playlists:
         start: "2-13"
         end: "2-14"
         count: 20
+     - name: "St Patrick"
+        source: "3B8oQqITi8jQr83PCkTzXE"
+        start: "3-17"
+        end: "3-17"
+        count: 25
         
   - type: radio
     target_playlist: "12xAHzCe9tccDj8LrmZoah" # THE BUCKNER SHOW 
