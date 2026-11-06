@@ -204,14 +204,21 @@ def process_mapping(sp, mapping, live):
     finalize_and_write(sp, target_id, picked, live)
 
 
+# Radio roles with a fixed meaning. Any other key under a radio mapping's
+# `sources` is treated as an extra sampled source (count from `samples`).
+RADIO_FIXED_ROLES = ("top_songs", "top_albums", "classics", "great_classics")
+
+
 def process_radio_mapping(sp, mapping, live):
     """Process one target/sources mapping (RADIO type). Raises on failure --
     the caller decides whether to let one failure stop the whole run.
 
     A radio mapping has named source roles rather than a flat source list:
     Top Songs is included in full; Top Albums / Classics / Great Classics
-    each contribute a random sample; any "holiday" source whose date window
-    covers today also contributes a sample. Before assembling the playlist,
+    each contribute a random sample, as does any extra named source (e.g.
+    "retro") listed under `sources` with a count under `samples`; any
+    "holiday" source whose date window covers today also contributes a
+    sample. Before assembling the playlist,
     Top Songs tracks older than classics_promotion.after_weeks are copied
     into Classics (never removed from Top Songs, never duplicated)."""
     target_id = mapping["target_playlist"]
@@ -268,11 +275,33 @@ def process_radio_mapping(sp, mapping, live):
     # Top Songs contributes in full (deduped, but not sampled/truncated).
     picked = list(select_tracks(top_songs, len(top_songs)))
 
-    sampled_roles = (
-        ("Top Albums", top_albums_id, samples.get("top_albums", 0), None),
-        ("Classics", classics_id, samples.get("classics", 0), classics),
-        ("Great Classics", great_classics_id, samples.get("great_classics", 0), None),
+    # The three standard sampled roles keep their usual labels and order;
+    # any other role named under `sources` (e.g. "retro") is an extra
+    # sampled source and must have a matching count under `samples`.
+    standard_roles = (
+        ("top_albums", "Top Albums", top_albums_id, None),
+        ("classics", "Classics", classics_id, classics),
+        ("great_classics", "Great Classics", great_classics_id, None),
     )
+    extra_role_names = [r for r in sources if r not in RADIO_FIXED_ROLES]
+    missing_counts = [r for r in extra_role_names if r not in samples]
+    if missing_counts:
+        raise ValueError(
+            f"[{target_id}] extra source(s) {missing_counts} have no count under 'samples'"
+        )
+    orphan_samples = [r for r in samples if r not in sources]
+    if orphan_samples:
+        raise ValueError(
+            f"[{target_id}] 'samples' has count(s) for {orphan_samples} but no matching entry under 'sources'"
+        )
+
+    sampled_roles = [
+        (label, playlist_id, samples.get(role, 0), cached)
+        for role, label, playlist_id, cached in standard_roles
+    ] + [
+        (role.replace("_", " ").title(), sources[role], samples[role], None)
+        for role in extra_role_names
+    ]
     for label, playlist_id, count, cached_tracks in sampled_roles:
         if cached_tracks is not None:
             tracks = cached_tracks
