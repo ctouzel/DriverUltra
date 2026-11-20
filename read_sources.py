@@ -10,15 +10,20 @@ Usage:
     python read_sources.py
 """
 
+import logging
 import os
 import sys
+import time
 
+import requests
 import spotipy
 import yaml
 from spotipy.oauth2 import SpotifyOAuth
 
 CONFIG_PATH = "config.yaml"
 REDIRECT_URI = "http://127.0.0.1:8888/callback"
+
+log = logging.getLogger(__name__)
 
 
 def get_spotify_client():
@@ -40,7 +45,37 @@ def get_spotify_client():
         redirect_uri=REDIRECT_URI,
     )
     token_info = auth_manager.refresh_access_token(refresh_token)
-    return spotipy.Spotify(auth=token_info["access_token"])
+    # requests_timeout: spotipy's default is 5 s, too short right after a
+    # long rate-limit wait (failed run, 2026-11-20: ReadTimeout after a 685 s
+    # Retry-After). 429s are still retried by spotipy, honoring Retry-After.
+    return spotipy.Spotify(
+        auth=token_info["access_token"],
+        requests_timeout=30,
+        retries=5,
+        status_retries=5,
+        backoff_factor=1,
+    )
+
+
+# Network errors spotipy does NOT retry by itself (it never retries read
+# timeouts). Retried here a few times, with a growing pause, before giving up.
+TRANSIENT_ERRORS = (requests.exceptions.Timeout, requests.exceptions.ConnectionError)
+TRANSIENT_ATTEMPTS = 4
+
+
+def call_with_retry(func, *args, **kwargs):
+    for attempt in range(1, TRANSIENT_ATTEMPTS + 1):
+        try:
+            return func(*args, **kwargs)
+        except TRANSIENT_ERRORS as e:
+            if attempt == TRANSIENT_ATTEMPTS:
+                raise
+            wait = 10 * attempt
+            log.warning(
+                "Spotify request failed (%s), attempt %d/%d -- retrying in %d s",
+                type(e).__name__, attempt, TRANSIENT_ATTEMPTS, wait,
+            )
+            time.sleep(wait)
 
 
 def load_config(path=CONFIG_PATH):
@@ -59,8 +94,9 @@ def fetch_all_tracks(sp, playlist_id):
     # string can't silently zero out the results. market="from_token" works
     # around a known Spotify API issue where newer apps get track:null for
     # every item unless a market is explicitly resolved.
-    results = sp.playlist_items(
-        playlist_id, additional_types=["track"], market="from_token"
+    results = call_with_retry(
+        sp.playlist_items,
+        playlist_id, additional_types=["track"], market="from_token",
     )
     total_reported = results.get("total")
     skipped_null = 0
@@ -85,7 +121,7 @@ def fetch_all_tracks(sp, playlist_id):
                     "added_at": item.get("added_at"),
                 }
             )
-        results = sp.next(results) if results.get("next") else None
+        results = call_with_retry(sp.next, results) if results.get("next") else None
     return tracks, total_reported, skipped_null
 
 

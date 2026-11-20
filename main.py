@@ -251,13 +251,17 @@ def process_radio_mapping(sp, mapping, live):
     after_weeks = promotion_cfg.get("after_weeks")
     if after_weeks is not None:
         if live:
+            to_promote = set(find_promotable(top_songs, classics, after_weeks))
             promoted = promote_aged_top_songs(
                 sp, log, target_id, top_songs, classics_id, classics, after_weeks
             )
             if promoted:
-                # Re-read so the freshly promoted tracks are eligible for
-                # this run's Classics sample too.
-                classics, _, _ = fetch_all_tracks(sp, classics_id)
+                # Add the freshly promoted tracks to the in-memory Classics
+                # list so they're eligible for this run's sample too. No
+                # re-read of the whole playlist: on big Classics playlists
+                # (thousands of tracks) that doubled the API calls and hit
+                # Spotify's rate limit (failed run, 2026-11-20).
+                classics = classics + [t for t in top_songs if t["uri"] in to_promote]
         else:
             to_promote = find_promotable(top_songs, classics, after_weeks)
             if to_promote:
